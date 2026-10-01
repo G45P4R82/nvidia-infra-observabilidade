@@ -52,6 +52,9 @@
         - grafana/provisioning/datasources/prometheus.yml
         - grafana/provisioning/dashboards/dashboards.yml
         - grafana/dashboards/infraestrutura.json
+        - grafana/dashboards/host.json
+        - grafana/dashboards/docker.json
+        - grafana/dashboards/gpu.json
       notify: Reiniciar observabilidade
 
     - name: Renderizar variáveis da stack
@@ -97,6 +100,12 @@
       retries: 20
       delay: 5
       until: grafana_ready.status == 200
+
+    - name: Garantir senha do administrador do Grafana
+      ansible.builtin.command:
+        cmd: docker exec observabilidade_grafana grafana cli admin reset-admin-password "{{ observability_grafana_admin_password }}"
+      changed_when: false
+      no_log: true
 
   handlers:
     - name: Reiniciar observabilidade

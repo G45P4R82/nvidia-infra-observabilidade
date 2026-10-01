@@ -1,0 +1,20 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {"id": 1, "type": "stat", "title": "Containers ativos", "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0}, "targets": [{"expr": "count(container_last_seen)"}]},
+    {"id": 2, "type": "stat", "title": "CPU dos containers", "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0}, "targets": [{"expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[5m])) * 100"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 3, "type": "stat", "title": "Memória dos containers", "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0}, "targets": [{"expr": "sum(container_memory_usage_bytes{name!=\"\"})"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+    {"id": 4, "type": "stat", "title": "Containers sem métrica", "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0}, "targets": [{"expr": "count(time() - container_last_seen > 60)"}]},
+    {"id": 5, "type": "timeseries", "title": "CPU por container", "gridPos": {"h": 10, "w": 12, "x": 0, "y": 5}, "targets": [{"expr": "sum by(name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[5m])) * 100", "legendFormat": "{{name}}"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 6, "type": "timeseries", "title": "Memória por container", "gridPos": {"h": 10, "w": 12, "x": 12, "y": 5}, "targets": [{"expr": "sum by(name) (container_memory_usage_bytes{name!=\"\"})", "legendFormat": "{{name}}"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+    {"id": 7, "type": "table", "title": "Containers e memória atual", "gridPos": {"h": 10, "w": 24, "x": 0, "y": 15}, "targets": [{"expr": "sort_desc(container_memory_usage_bytes{name!=\"\"})", "format": "table", "instant": true}], "fieldConfig": {"defaults": {"unit": "bytes"}}}
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["bi", "docker", "containers"],
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "BI 2 - Operação dos Containers",
+  "uid": "bi-docker",
+  "version": 1
+}

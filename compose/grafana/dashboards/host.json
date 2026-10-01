@@ -1,0 +1,21 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {"id": 1, "type": "stat", "title": "CPU usada", "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0}, "targets": [{"expr": "100 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 2, "type": "stat", "title": "Memória usada", "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0}, "targets": [{"expr": "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 3, "type": "stat", "title": "Filesystem usado", "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0}, "targets": [{"expr": "max(100 * (1 - node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay\"}))"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 4, "type": "stat", "title": "Load 5m", "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0}, "targets": [{"expr": "node_load5"}]},
+    {"id": 5, "type": "timeseries", "title": "CPU por modo", "gridPos": {"h": 9, "w": 12, "x": 0, "y": 5}, "targets": [{"expr": "sum by(mode) (rate(node_cpu_seconds_total[5m]))", "legendFormat": "{{mode}}"}]},
+    {"id": 6, "type": "timeseries", "title": "Memória disponível", "gridPos": {"h": 9, "w": 12, "x": 12, "y": 5}, "targets": [{"expr": "node_memory_MemAvailable_bytes", "legendFormat": "Disponível"}, {"expr": "node_memory_MemTotal_bytes", "legendFormat": "Total"}], "fieldConfig": {"defaults": {"unit": "bytes"}}},
+    {"id": 7, "type": "timeseries", "title": "Tráfego de rede", "gridPos": {"h": 9, "w": 12, "x": 0, "y": 14}, "targets": [{"expr": "sum by(device) (rate(node_network_receive_bytes_total{device!~\"lo\"}[5m]))", "legendFormat": "RX {{device}}"}, {"expr": "sum by(device) (rate(node_network_transmit_bytes_total{device!~\"lo\"}[5m]))", "legendFormat": "TX {{device}}"}], "fieldConfig": {"defaults": {"unit": "Bps"}}},
+    {"id": 8, "type": "timeseries", "title": "I/O de disco", "gridPos": {"h": 9, "w": 12, "x": 12, "y": 14}, "targets": [{"expr": "sum by(device) (rate(node_disk_read_bytes_total[5m]))", "legendFormat": "Leitura {{device}}"}, {"expr": "sum by(device) (rate(node_disk_written_bytes_total[5m]))", "legendFormat": "Escrita {{device}}"}], "fieldConfig": {"defaults": {"unit": "Bps"}}}
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["bi", "host", "infraestrutura"],
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "BI 1 - Saúde do Host",
+  "uid": "bi-host",
+  "version": 1
+}

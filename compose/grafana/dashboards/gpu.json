@@ -1,0 +1,21 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {"id": 1, "type": "stat", "title": "Utilização GPU", "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0}, "targets": [{"expr": "DCGM_FI_DEV_GPU_UTIL"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 2, "type": "stat", "title": "Temperatura", "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0}, "targets": [{"expr": "DCGM_FI_DEV_GPU_TEMP"}], "fieldConfig": {"defaults": {"unit": "celsius"}}},
+    {"id": 3, "type": "stat", "title": "Memória usada", "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0}, "targets": [{"expr": "DCGM_FI_DEV_FB_USED"}], "fieldConfig": {"defaults": {"unit": "decmbytes"}}},
+    {"id": 4, "type": "stat", "title": "Potência", "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0}, "targets": [{"expr": "DCGM_FI_DEV_POWER_USAGE"}], "fieldConfig": {"defaults": {"unit": "watt"}}},
+    {"id": 5, "type": "timeseries", "title": "Utilização da GPU", "gridPos": {"h": 9, "w": 12, "x": 0, "y": 5}, "targets": [{"expr": "DCGM_FI_DEV_GPU_UTIL", "legendFormat": "GPU {{gpu}}"}], "fieldConfig": {"defaults": {"unit": "percent"}}},
+    {"id": 6, "type": "timeseries", "title": "Memória da GPU", "gridPos": {"h": 9, "w": 12, "x": 12, "y": 5}, "targets": [{"expr": "DCGM_FI_DEV_FB_USED", "legendFormat": "Usada {{gpu}}"}, {"expr": "DCGM_FI_DEV_FB_FREE", "legendFormat": "Livre {{gpu}}"}], "fieldConfig": {"defaults": {"unit": "decmbytes"}}},
+    {"id": 7, "type": "timeseries", "title": "Temperatura e potência", "gridPos": {"h": 9, "w": 12, "x": 0, "y": 14}, "targets": [{"expr": "DCGM_FI_DEV_GPU_TEMP", "legendFormat": "Temperatura C"}, {"expr": "DCGM_FI_DEV_POWER_USAGE", "legendFormat": "Potência W"}]},
+    {"id": 8, "type": "table", "title": "Identificação da GPU", "gridPos": {"h": 9, "w": 12, "x": 12, "y": 14}, "targets": [{"expr": "DCGM_FI_DEV_GPU_UTIL", "format": "table", "instant": true}], "fieldConfig": {"defaults": {"custom": {"align": "auto"}}}}
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["bi", "gpu", "nvidia", "rtx-5090"],
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "BI 3 - GPU NVIDIA RTX 5090",
+  "uid": "bi-gpu",
+  "version": 1
+}
