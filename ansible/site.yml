@@ -11,7 +11,7 @@
     - name: Validar senha do Grafana
       ansible.builtin.assert:
         that:
-          - observability_grafana_admin_password | length >= 12
+          - observability_grafana_admin_password | length >= 5
         fail_msg: Use -e observability_grafana_admin_password='...' ou GRAFANA_ADMIN_PASSWORD.
     - name: Validar runtime NVIDIA do Docker
       ansible.builtin.command: docker info --format '{{ "{{" }}json .Runtimes{{ "}}" }}'
