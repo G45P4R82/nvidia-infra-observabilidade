@@ -1,9 +1,9 @@
 ---
 - name: Deploy NVIDIA Infra Observabilidade
   hosts: observability
-  become: true
+  become: false
   vars:
-    observability_dir: /opt/nvidia-infra-observabilidade
+    observability_dir: /home/getter/nvidia-infra-observabilidade
     observability_grafana_admin_user: admin
     observability_grafana_admin_password: "{{ lookup('ansible.builtin.env', 'GRAFANA_ADMIN_PASSWORD') | default('', true) }}"
     observability_prometheus_retention: 30d
@@ -26,8 +26,8 @@
       ansible.builtin.file:
         path: "{{ observability_dir }}/{{ item }}"
         state: directory
-        owner: root
-        group: root
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0755"
       loop:
         - compose
@@ -42,8 +42,8 @@
       ansible.builtin.copy:
         src: "../compose/{{ item }}"
         dest: "{{ observability_dir }}/compose/{{ item }}"
-        owner: root
-        group: root
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0644"
       loop:
         - docker-compose.yml
@@ -57,8 +57,8 @@
     - name: Renderizar variáveis da stack
       ansible.builtin.copy:
         dest: "{{ observability_dir }}/compose/.env"
-        owner: root
-        group: root
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0600"
         content: |
           GRAFANA_ADMIN_USER={{ observability_grafana_admin_user }}

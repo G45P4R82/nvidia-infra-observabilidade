@@ -17,7 +17,7 @@ ansible-playbook -i ansible/inventory.ini ansible/site.yml \
   -e ansible_user=getter -e observability_grafana_admin_password='troque-esta-senha'
 ```
 
-O playbook é idempotente e instala a stack em `/opt/nvidia-infra-observabilidade`. A senha do Grafana deve ser fornecida por Ansible Vault ou variável de ambiente, nunca versionada.
+O playbook é idempotente e instala a stack em `/home/getter/nvidia-infra-observabilidade`. A senha do Grafana deve ser fornecida por Ansible Vault ou variável de ambiente, nunca versionada.
 
 ## Verificação
 
