@@ -1,4 +1,5 @@
 *.retry
+__pycache__/
 .env
 *.vault
 ansible/inventory.local.ini
