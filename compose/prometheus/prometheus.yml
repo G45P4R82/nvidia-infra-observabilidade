@@ -18,6 +18,10 @@ scrape_configs:
     static_configs:
       - targets: [cadvisor:8080]
 
+  - job_name: docker
+    static_configs:
+      - targets: [docker-exporter:9410]
+
   - job_name: dcgm
     static_configs:
       - targets: [dcgm-exporter:9400]

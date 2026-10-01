@@ -70,14 +70,26 @@ services:
     container_name: observabilidade_cadvisor
     restart: unless-stopped
     privileged: true
+    command:
+      - --docker_only=true
+      - --docker=unix:///var/run/docker.sock
     devices:
       - /dev/kmsg:/dev/kmsg
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
       - /dev/disk:/dev/disk:ro
+
+  docker-exporter:
+    build:
+      context: ./docker-exporter
+    container_name: observabilidade_docker_exporter
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   dcgm-exporter:
     image: nvcr.io/nvidia/k8s/dcgm-exporter:4.4.1-4.6.0-ubuntu22.04

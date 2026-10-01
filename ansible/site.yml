@@ -33,6 +33,7 @@
         - compose
         - compose/prometheus
         - compose/prometheus/rules
+        - compose/docker-exporter
         - compose/grafana
         - compose/grafana/provisioning/datasources
         - compose/grafana/provisioning/dashboards
@@ -49,6 +50,8 @@
         - docker-compose.yml
         - prometheus/prometheus.yml
         - prometheus/rules/alerts.yml
+        - docker-exporter/Dockerfile
+        - docker-exporter/exporter.py
         - grafana/provisioning/datasources/prometheus.yml
         - grafana/provisioning/dashboards/dashboards.yml
         - grafana/dashboards/infraestrutura.json
@@ -78,10 +81,22 @@
 
     - name: Subir stack
       ansible.builtin.command:
-        cmd: docker compose --env-file .env -f docker-compose.yml up -d
+        cmd: docker compose --env-file .env -f docker-compose.yml up -d --build
         chdir: "{{ observability_dir }}/compose"
       register: compose_up
       changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout or 'Recreated' in compose_up.stdout"
+
+    - name: Recriar Prometheus com configuração atualizada
+      ansible.builtin.command:
+        cmd: docker compose --env-file .env -f docker-compose.yml up -d --force-recreate prometheus
+        chdir: "{{ observability_dir }}/compose"
+
+    - name: Recarregar configuração do Prometheus
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9090/-/reload
+        method: POST
+        status_code: 200
+      changed_when: false
 
     - name: Aguardar Prometheus
       ansible.builtin.uri:
