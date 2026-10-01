@@ -1,0 +1,21 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {"id": 1, "title": "CPU usada", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}, "targets": [{"expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)", "legendFormat": "CPU %"}]},
+    {"id": 2, "title": "Memória usada", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}, "targets": [{"expr": "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)", "legendFormat": "Memória %"}]},
+    {"id": 3, "title": "GPU utilização", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}, "targets": [{"expr": "DCGM_FI_DEV_GPU_UTIL", "legendFormat": "GPU {{gpu}}"}]},
+    {"id": 4, "title": "GPU memória usada", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}, "targets": [{"expr": "DCGM_FI_DEV_FB_USED", "legendFormat": "GPU {{gpu}} MiB"}]},
+    {"id": 5, "title": "Temperatura e potência da GPU", "type": "timeseries", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}, "targets": [{"expr": "DCGM_FI_DEV_GPU_TEMP", "legendFormat": "Temperatura C"}, {"expr": "DCGM_FI_DEV_POWER_USAGE", "legendFormat": "Potência W"}]},
+    {"id": 6, "title": "Containers ativos", "type": "stat", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}, "targets": [{"expr": "count(container_last_seen)", "legendFormat": "Containers"}]}
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["nvidia", "infraestrutura", "docker"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "NVIDIA Infraestrutura",
+  "uid": "nvidia-infra",
+  "version": 1
+}

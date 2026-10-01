@@ -1,0 +1,34 @@
+groups:
+  - name: infraestrutura
+    rules:
+      - alert: ExporterDown
+        expr: up{job=~"node|cadvisor|dcgm"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Exporter {{ $labels.job }} indisponível"
+
+      - alert: HostFilesystemAlmostFull
+        expr: 100 * (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Filesystem {{ $labels.mountpoint }} acima de 85%"
+
+      - alert: HostMemoryAlmostFull
+        expr: 100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memória do host acima de 90%"
+
+      - alert: GPUTemperatureHigh
+        expr: DCGM_FI_DEV_GPU_TEMP > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Temperatura da GPU acima de 85 graus Celsius"

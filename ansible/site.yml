@@ -1,0 +1,105 @@
+---
+- name: Deploy NVIDIA Infra Observabilidade
+  hosts: observability
+  become: true
+  vars:
+    observability_dir: /opt/nvidia-infra-observabilidade
+    observability_grafana_admin_user: admin
+    observability_grafana_admin_password: "{{ lookup('ansible.builtin.env', 'GRAFANA_ADMIN_PASSWORD') | default('', true) }}"
+    observability_prometheus_retention: 30d
+  pre_tasks:
+    - name: Validar senha do Grafana
+      ansible.builtin.assert:
+        that:
+          - observability_grafana_admin_password | length >= 12
+        fail_msg: Use -e observability_grafana_admin_password='...' ou GRAFANA_ADMIN_PASSWORD.
+    - name: Validar runtime NVIDIA do Docker
+      ansible.builtin.command: docker info --format '{{ "{{" }}json .Runtimes{{ "}}" }}'
+      register: docker_info
+      changed_when: false
+    - name: Exigir runtime NVIDIA
+      ansible.builtin.assert:
+        that: "'nvidia' in docker_info.stdout"
+        fail_msg: NVIDIA Container Toolkit/runtime não está configurado no Docker.
+  tasks:
+    - name: Criar diretórios da stack
+      ansible.builtin.file:
+        path: "{{ observability_dir }}/{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - compose
+        - compose/prometheus
+        - compose/prometheus/rules
+        - compose/grafana
+        - compose/grafana/provisioning/datasources
+        - compose/grafana/provisioning/dashboards
+        - compose/grafana/dashboards
+
+    - name: Copiar arquivos Compose e configuração
+      ansible.builtin.copy:
+        src: "../compose/{{ item }}"
+        dest: "{{ observability_dir }}/compose/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - docker-compose.yml
+        - prometheus/prometheus.yml
+        - prometheus/rules/alerts.yml
+        - grafana/provisioning/datasources/prometheus.yml
+        - grafana/provisioning/dashboards/dashboards.yml
+        - grafana/dashboards/infraestrutura.json
+      notify: Reiniciar observabilidade
+
+    - name: Renderizar variáveis da stack
+      ansible.builtin.copy:
+        dest: "{{ observability_dir }}/compose/.env"
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          GRAFANA_ADMIN_USER={{ observability_grafana_admin_user }}
+          GRAFANA_ADMIN_PASSWORD={{ observability_grafana_admin_password }}
+          PROMETHEUS_RETENTION={{ observability_prometheus_retention }}
+      no_log: true
+      notify: Reiniciar observabilidade
+
+    - name: Validar configuração Compose
+      ansible.builtin.command:
+        cmd: docker compose --env-file .env -f docker-compose.yml config -q
+        chdir: "{{ observability_dir }}/compose"
+      changed_when: false
+
+    - name: Subir stack
+      ansible.builtin.command:
+        cmd: docker compose --env-file .env -f docker-compose.yml up -d
+        chdir: "{{ observability_dir }}/compose"
+      register: compose_up
+      changed_when: "'Started' in compose_up.stdout or 'Created' in compose_up.stdout or 'Recreated' in compose_up.stdout"
+
+    - name: Aguardar Prometheus
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9090/-/ready
+        status_code: 200
+      register: prometheus_ready
+      retries: 20
+      delay: 5
+      until: prometheus_ready.status == 200
+
+    - name: Aguardar Grafana
+      ansible.builtin.uri:
+        url: http://127.0.0.1:3000/api/health
+        status_code: 200
+      register: grafana_ready
+      retries: 20
+      delay: 5
+      until: grafana_ready.status == 200
+
+  handlers:
+    - name: Reiniciar observabilidade
+      ansible.builtin.command:
+        cmd: docker compose --env-file .env -f docker-compose.yml up -d
+        chdir: "{{ observability_dir }}/compose"
